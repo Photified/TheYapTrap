@@ -37,6 +37,8 @@
       min-height: 100vh;
       transition: background-color 0.4s ease, color 0.4s ease;
       overflow-x: hidden;
+      /* Prevent accidental pull-to-refresh on mobile */
+      overscroll-behavior-y: contain; 
     }
 
     .app-container {
@@ -126,7 +128,14 @@
     }
     button.action-btn:active { transform: scale(0.97); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
-    #recordBtn { background-color: var(--accent-orange); color: white; }
+    /* Special styling for push-to-talk to prevent text selection and highlight */
+    #recordBtn { 
+      background-color: var(--accent-orange); 
+      color: white; 
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
     #recordBtn:hover { background-color: #ea580c; }
 
     #calibrateBtn { background-color: var(--accent-blue); color: white; font-size: 0.9rem; padding: 12px; }
@@ -205,7 +214,7 @@
       z-index: 2;
     }
 
-    /* --- Footer Link (Replaces Cogwheel) --- */
+    /* --- Footer Link --- */
     .footer-links {
       text-align: center;
       margin-top: 15px;
@@ -223,6 +232,13 @@
     #helpTriggerBtn:hover {
       color: var(--text-main);
       text-decoration: underline;
+    }
+
+    /* Hide the manual automatically if the PWA is installed and running standalone */
+    @media all and (display-mode: standalone) {
+      .footer-links {
+        display: none !important;
+      }
     }
 
     /* --- Premium Help Modal --- */
@@ -353,7 +369,7 @@
         </select>
       </div>
 
-      <button class="action-btn" id="recordBtn">🎤 Record Custom "Shut Up!"</button>
+      <button class="action-btn" id="recordBtn">🎤 HOLD TO RECORD CUSTOM "SHUT UP!"</button>
 
       <div class="meter-container">
         <label for="threshold">Trigger Sensitivity: <span id="threshVal">50</span>%</label>
@@ -381,7 +397,7 @@
       <button class="close-btn" id="closeModalBtn">✖</button>
       <h2>System Manual</h2>
       <ul>
-        <li><b>Select a Voice:</b> Choose a pre-loaded payload or record your own aggressive message.</li>
+        <li><b>Select a Voice:</b> Choose a pre-loaded payload or hold the record button to make your own.</li>
         <li><b>Test Ambient Noise:</b> Click the test button and drag the slider so the white line sits just above the room's normal background noise.</li>
         <li><b>Arm It:</b> Press the big red button. Let them talk. Wait for the trap to spring.</li>
       </ul>
@@ -434,6 +450,10 @@
     let isCooldown = false;
     let customAudioUrl = null;
     let customAudioElement = new Audio();
+    
+    // Recording state
+    let mediaRecorder;
+    let audioChunks = [];
 
     // --- DOM Elements ---
     const body = document.body;
@@ -472,12 +492,17 @@
       speechSynthesis.speak(utterance);
     }
 
-    // --- Custom Recording Logic ---
-    recordBtn.addEventListener('click', async () => {
+    // --- Custom Recording Logic (Push-to-Talk) ---
+    async function startRecording(e) {
+      e.preventDefault(); // Prevents touch events from firing mouse events simultaneously
+      
+      // Don't start a new recording if one is already active
+      if (mediaRecorder && mediaRecorder.state === 'recording') return;
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mediaRecorder = new MediaRecorder(stream);
-        const audioChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
 
         mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
         mediaRecorder.onstop = () => {
@@ -486,15 +511,36 @@
           body.className = '';
           statusText.innerText = "✅ PAYLOAD SAVED";
           voiceSelect.value = "custom";
+          recordBtn.innerText = '🎤 HOLD TO RECORD CUSTOM "SHUT UP!"';
+          
+          // Stop all microphone tracks to turn off the browser mic light
+          stream.getTracks().forEach(track => track.stop());
         };
 
         body.className = 'recording';
-        statusText.innerText = "🔴 RECORDING (YELL NOW)...";
+        statusText.innerText = "🔴 RECORDING (RELEASE TO SAVE)";
+        recordBtn.innerText = "🔴 RECORDING...";
         
         mediaRecorder.start();
-        setTimeout(() => mediaRecorder.stop(), 2000);
       } catch (err) { alert("Microphone permission required to record!"); }
-    });
+    }
+
+    function stopRecording(e) {
+      e.preventDefault();
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+      }
+    }
+
+    // Bind start events
+    recordBtn.addEventListener('mousedown', startRecording);
+    recordBtn.addEventListener('touchstart', startRecording, { passive: false });
+
+    // Bind stop events (listening on window ensures we catch it even if they drag off the button)
+    window.addEventListener('mouseup', stopRecording);
+    recordBtn.addEventListener('touchend', stopRecording);
+    recordBtn.addEventListener('touchcancel', stopRecording);
+
 
     // --- Setup Audio Node ---
     async function initAudio() {
