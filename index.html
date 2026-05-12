@@ -24,9 +24,7 @@
       --accent-red: #ef4444; 
       --accent-red-hover: #dc2626; 
       --accent-yellow: #facc15; 
-      --accent-orange: #f97316; 
-      --accent-green: #22c55e; 
-      --accent-blue: #3b82f6;
+      --accent-yellow-hover: #eab308;
       --border-color: rgba(255, 255, 255, 0.1);
     }
 
@@ -118,26 +116,27 @@
     }
 
     #recordBtn { 
-      background-color: var(--accent-orange); 
-      color: white; 
+      background-color: var(--accent-yellow); 
+      color: #000; 
       user-select: none; 
       -webkit-user-select: none; 
       touch-action: none; 
     }
 
     #recordBtn:hover { 
-      background-color: #ea580c; 
+      background-color: var(--accent-yellow-hover); 
     }
 
     #calibrateBtn { 
-      background-color: var(--accent-blue); 
-      color: white; 
+      background-color: #333; 
+      color: var(--accent-yellow); 
+      border: 1px solid #444;
       font-size: 0.9rem; 
       padding: 12px; 
     }
 
     #calibrateBtn:hover { 
-      background-color: #2563eb; 
+      background-color: #444; 
     }
 
     #armBtn {
@@ -196,7 +195,6 @@
     }
 
     .meter-bar-bg { 
-      /* Alignment Fix: Subtracting exactly the 24px thumb width and creating a 12px margin on both sides */
       width: calc(100% - 24px); 
       margin: 0 12px; 
       height: 20px; 
@@ -224,7 +222,6 @@
       background: #fff; 
       box-shadow: 0 0 5px #fff; 
       z-index: 2; 
-      /* Alignment Fix: Forces the center of this line to sit exactly on the percentage mark */
       transform: translateX(-50%); 
     }
 
@@ -357,7 +354,7 @@
 
     #installBtn { 
       display: none; 
-      background-color: var(--accent-green); 
+      background-color: var(--accent-yellow); 
       color: #000; 
     }
 
@@ -390,11 +387,11 @@
     }
 
     body.recording { 
-      background-color: #431407; 
+      background-color: #3f3f00; 
     }
 
     body.recording #statusText { 
-      color: var(--accent-orange); 
+      color: var(--accent-yellow); 
     }
 
   </style>
@@ -411,8 +408,8 @@
       <button class="action-btn" id="recordBtn">🎤 HOLD TO RECORD "SHUT UP!"</button>
 
       <div class="meter-container">
-        <label for="threshold">Trigger Sensitivity: <span id="threshVal">50</span>%</label>
-        <input type="range" id="threshold" min="10" max="150" value="50">
+        <label for="threshold">Trigger Sensitivity: <span id="threshVal">33</span>%</label>
+        <input type="range" id="threshold" min="0" max="150" value="50">
         
         <div class="meter-bar-bg">
            <div class="meter-bar-fill" id="volumeMeterFill"></div>
@@ -435,7 +432,7 @@
       <button class="close-btn" id="closeModalBtn">✖</button>
       <h2>System Manual</h2>
       <ul>
-        <li><b>Load Payload:</b> Hold the orange record button to yell your custom "Shut Up!" into the system.</li>
+        <li><b>Load Payload:</b> Hold the yellow record button to yell your custom "Shut Up!" into the system.</li>
         <li><b>Test Ambient Noise:</b> Click the test button and drag the slider so the white line sits just above the room's normal background noise.</li>
         <li><b>Arm It:</b> Press the big red button. Let them talk. Wait for the trap to spring.</li>
       </ul>
@@ -564,8 +561,8 @@
         };
 
         body.className = 'recording';
-        statusText.innerText = "🔴 RECORDING (RELEASE TO SAVE)";
-        recordBtn.innerText = "🔴 RECORDING...";
+        statusText.innerText = "🟡 RECORDING (RELEASE TO SAVE)";
+        recordBtn.innerText = "🟡 RECORDING...";
         
         mediaRecorder.start();
       } catch (err) { 
@@ -639,7 +636,7 @@
       }
       
       if (!customAudioUrl) {
-        alert("⚠️ You need to hold the orange button and record your payload first!");
+        alert("⚠️ You need to hold the yellow button and record your payload first!");
         return;
       }
       
