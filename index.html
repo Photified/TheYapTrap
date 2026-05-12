@@ -23,9 +23,9 @@
       --text-muted: #9ca3af;
       --accent-red: #ef4444; 
       --accent-red-hover: #dc2626; 
-      --accent-yellow: #facc15; /* Saturated yellow for accents */
+      --accent-yellow: #facc15; 
       --accent-orange: #f97316; 
-      --accent-green: #22c55e; /* Kept variable, but meter will use yellow */
+      --accent-green: #22c55e; 
       --accent-blue: #3b82f6;
       --border-color: rgba(255, 255, 255, 0.1);
     }
@@ -36,7 +36,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex; 
       justify-content: center; 
-      align-items: center; /* Add this to center everything from top to bottom */
+      align-items: center; 
       min-height: 100vh;
       transition: background-color 0.4s ease, color 0.4s ease;
       overflow-x: hidden; 
@@ -70,7 +70,7 @@
 
     #statusText {
       font-size: 1.2rem; 
-      color: var(--accent-yellow); /* default to yellow when disarmed for scheme match */
+      color: var(--accent-yellow); 
       font-weight: 700;
       text-transform: uppercase; 
       letter-spacing: 2px; 
@@ -178,7 +178,7 @@
       height: 24px; 
       width: 24px; 
       border-radius: 50%; 
-      background: var(--accent-yellow); /* Change white to yellow for styling */
+      background: var(--accent-yellow); 
       cursor: pointer; 
       -webkit-appearance: none; 
       margin-top: -8px; 
@@ -196,7 +196,9 @@
     }
 
     .meter-bar-bg { 
-      width: 100%; 
+      /* Alignment Fix: Subtracting exactly the 24px thumb width and creating a 12px margin on both sides */
+      width: calc(100% - 24px); 
+      margin: 0 12px; 
       height: 20px; 
       background: #000; 
       border-radius: 10px; 
@@ -209,9 +211,9 @@
     .meter-bar-fill { 
       height: 100%; 
       width: 0%; 
-      background: var(--accent-yellow); /* Change green to yellow */
+      background: var(--accent-yellow); 
       transition: width 0.05s linear, background-color 0.1s linear; 
-      box-shadow: 0 0 10px var(--accent-yellow); /* Change green shadow to yellow */
+      box-shadow: 0 0 10px var(--accent-yellow); 
     }
 
     .meter-bar-threshold { 
@@ -222,6 +224,8 @@
       background: #fff; 
       box-shadow: 0 0 5px #fff; 
       z-index: 2; 
+      /* Alignment Fix: Forces the center of this line to sit exactly on the percentage mark */
+      transform: translateX(-50%); 
     }
 
     /* --- Footer Link --- */
@@ -513,9 +517,9 @@
     const volumeMeterThreshold = document.getElementById('volumeMeterThreshold');
 
     function updateThresholdUI(val) {
-      const percentage = Math.round((val / 150) * 100);
-      threshValText.innerText = percentage;
-      volumeMeterThreshold.style.left = percentage + '%';
+      const percentageExact = (val / 150) * 100;
+      threshValText.innerText = Math.round(percentageExact);
+      volumeMeterThreshold.style.left = percentageExact + '%';
     }
 
     thresholdSlider.addEventListener('input', (e) => {
@@ -606,7 +610,6 @@
         isCalibrating = false;
         calibrateBtn.innerText = "🔊 Test Ambient Noise Level";
         volumeMeterFill.style.width = '0%';
-        // Restore disarmed text
         if (!isArmed) {
             statusText.innerText = "SYSTEM DISARMED";
         }
@@ -675,15 +678,14 @@
       
       let averageVolume = sum / dataArray.length;
       const threshold = parseInt(thresholdSlider.value);
-      const percentage = Math.min((averageVolume / 150) * 100, 100);
+      const percentageExact = Math.min((averageVolume / 150) * 100, 100);
       
-      volumeMeterFill.style.width = percentage + '%';
+      volumeMeterFill.style.width = percentageExact + '%';
       
       if (averageVolume > threshold) {
         volumeMeterFill.style.background = 'var(--accent-red)';
         volumeMeterFill.style.boxShadow = '0 0 15px var(--accent-red)';
       } else {
-        // Updated to use yellow for the base (green state)
         volumeMeterFill.style.background = 'var(--accent-yellow)';
         volumeMeterFill.style.boxShadow = '0 0 10px var(--accent-yellow)';
       }
