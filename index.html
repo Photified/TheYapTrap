@@ -49,69 +49,27 @@
       position: relative;
     }
 
-    /* --- Top Actions --- */
-    .top-bar {
-      display: flex;
-      justify-content: flex-end;
-      width: 100%;
-      margin-bottom: -10px;
-    }
-
-    #settingsBtn {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-color);
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--text-main);
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-      z-index: 10;
-    }
-    #settingsBtn:hover {
-      background: #2a2a2a;
-      transform: rotate(45deg);
-    }
-
-    /* --- Banner --- */
-    .banner-container {
-      width: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-      border: 1px solid var(--border-color);
-      background: #000;
-    }
-    
+    /* --- Banner (No Container) --- */
     #bannerImage {
       width: 100%;
       height: auto;
       display: block;
       object-fit: contain;
+      margin: 10px 0;
     }
 
-    /* --- Typography --- */
+    /* --- Status Indicator --- */
     .header-text {
       text-align: center;
+      margin-bottom: 5px;
     }
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-    p.sub {
-      font-size: 1rem;
+    #statusText {
+      font-size: 1.2rem;
       color: var(--text-muted);
-      font-weight: 500;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 2px;
+      transition: color 0.3s ease;
     }
 
     /* --- Controls Panel --- */
@@ -153,7 +111,7 @@
       background-size: 12px auto;
     }
 
-    button {
+    button.action-btn {
       width: 100%;
       padding: 16px;
       font-size: 1.1rem;
@@ -166,7 +124,7 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
-    button:active { transform: scale(0.97); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    button.action-btn:active { transform: scale(0.97); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
 
     #recordBtn { background-color: var(--accent-orange); color: white; }
     #recordBtn:hover { background-color: #ea580c; }
@@ -247,6 +205,26 @@
       z-index: 2;
     }
 
+    /* --- Footer Link (Replaces Cogwheel) --- */
+    .footer-links {
+      text-align: center;
+      margin-top: 15px;
+    }
+    #helpTriggerBtn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+    #helpTriggerBtn:hover {
+      color: var(--text-main);
+      text-decoration: underline;
+    }
+
     /* --- Premium Help Modal --- */
     .modal-overlay {
       display: none;
@@ -262,9 +240,7 @@
       animation: fadeIn 0.3s forwards;
     }
     
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
+    @keyframes fadeIn { to { opacity: 1; } }
 
     .modal {
       background: var(--bg-panel);
@@ -279,9 +255,7 @@
       animation: slideUp 0.3s forwards cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes slideUp {
-      to { transform: translateY(0); }
-    }
+    @keyframes slideUp { to { transform: translateY(0); } }
 
     .modal h2 { 
       margin-top: 0; 
@@ -316,9 +290,7 @@
       font-weight: bold;
     }
     
-    .modal li b {
-      color: var(--text-main);
-    }
+    .modal li b { color: var(--text-main); }
 
     .close-btn {
       position: absolute;
@@ -335,7 +307,6 @@
       font-size: 1.2rem;
       cursor: pointer;
       padding: 0;
-      box-shadow: none;
     }
     .close-btn:hover { background: rgba(255,255,255,0.2); color: white; }
 
@@ -346,26 +317,18 @@
     }
 
     /* --- App Visual States --- */
-    body.armed { 
-      background-color: #3f3f00; /* Darker yellow background */
-    }
+    body.armed { background-color: #3f3f00; }
     body.armed .controls {
       border-color: var(--accent-yellow);
       box-shadow: 0 0 30px rgba(250, 204, 21, 0.1);
     }
     body.armed #statusText { color: var(--accent-yellow); text-shadow: 0 0 15px var(--accent-yellow); }
 
-    body.triggered { 
-      background-color: #450a0a; /* Darker red background */
-    }
-    body.triggered .controls {
-      border-color: var(--accent-red);
-    }
+    body.triggered { background-color: #450a0a; }
+    body.triggered .controls { border-color: var(--accent-red); }
     body.triggered #statusText { color: var(--accent-red); text-shadow: 0 0 20px var(--accent-red); }
 
-    body.recording { 
-      background-color: #431407; /* Darker orange */
-    }
+    body.recording { background-color: #431407; }
     body.recording #statusText { color: var(--accent-orange); }
 
   </style>
@@ -374,17 +337,10 @@
 
   <div class="app-container">
     
-    <div class="top-bar">
-      <button id="settingsBtn" aria-label="Settings">⚙️</button>
-    </div>
-
-    <div class="banner-container">
-      <img src="banner.png" alt="Yap Trap Banner" id="bannerImage">
-    </div>
+    <img src="banner.png" alt="Yap Trap Banner" id="bannerImage">
 
     <div class="header-text">
-      <h1 id="statusText">YAP TRAP</h1>
-      <p class="sub" id="subText">System Disarmed</p>
+      <h2 id="statusText">SYSTEM DISARMED</h2>
     </div>
 
     <div class="controls">
@@ -397,7 +353,7 @@
         </select>
       </div>
 
-      <button id="recordBtn">🎤 Record Custom "Shut Up!"</button>
+      <button class="action-btn" id="recordBtn">🎤 Record Custom "Shut Up!"</button>
 
       <div class="meter-container">
         <label for="threshold">Trigger Sensitivity: <span id="threshVal">50</span>%</label>
@@ -408,11 +364,15 @@
            <div class="meter-bar-threshold" id="volumeMeterThreshold"></div>
         </div>
         
-        <button id="calibrateBtn">🔊 Test Ambient Noise Level</button>
+        <button class="action-btn" id="calibrateBtn">🔊 Test Ambient Noise Level</button>
       </div>
     </div>
 
-    <button id="armBtn">🚨 ARM THE TRAP 🚨</button>
+    <button class="action-btn" id="armBtn">🚨 ARM THE TRAP 🚨</button>
+
+    <div class="footer-links">
+      <button id="helpTriggerBtn">ℹ️ System Manual & Installation</button>
+    </div>
 
   </div>
 
@@ -425,7 +385,7 @@
         <li><b>Test Ambient Noise:</b> Click the test button and drag the slider so the white line sits just above the room's normal background noise.</li>
         <li><b>Arm It:</b> Press the big red button. Let them talk. Wait for the trap to spring.</li>
       </ul>
-      <button id="installBtn">📱 Install App to Home Screen</button>
+      <button class="action-btn" id="installBtn">📱 Install App to Home Screen</button>
     </div>
   </div>
 
@@ -456,7 +416,7 @@
 
     // --- Modal Logic ---
     const helpModal = document.getElementById('helpModal');
-    document.getElementById('settingsBtn').addEventListener('click', () => {
+    document.getElementById('helpTriggerBtn').addEventListener('click', () => {
       helpModal.style.display = 'flex';
     });
     document.getElementById('closeModalBtn').addEventListener('click', () => {
@@ -478,7 +438,6 @@
     // --- DOM Elements ---
     const body = document.body;
     const statusText = document.getElementById('statusText');
-    const subText = document.getElementById('subText');
     const armBtn = document.getElementById('armBtn');
     const recordBtn = document.getElementById('recordBtn');
     const calibrateBtn = document.getElementById('calibrateBtn');
@@ -492,7 +451,6 @@
 
     // Update threshold UI & Line Position
     function updateThresholdUI(val) {
-      // Calculate true percentage based on max value 150
       const percentage = Math.round((val / 150) * 100);
       threshValText.innerText = percentage;
       volumeMeterThreshold.style.left = percentage + '%';
@@ -526,14 +484,12 @@
           customAudioUrl = URL.createObjectURL(new Blob(audioChunks, { type: 'audio/webm' }));
           customAudioElement.src = customAudioUrl;
           body.className = '';
-          statusText.innerText = "PAYLOAD SAVED";
-          subText.innerText = "Custom voice ready.";
+          statusText.innerText = "✅ PAYLOAD SAVED";
           voiceSelect.value = "custom";
         };
 
         body.className = 'recording';
-        statusText.innerText = "RECORDING...";
-        subText.innerText = "Yell 'Shut Up!' now! (2 seconds)";
+        statusText.innerText = "🔴 RECORDING (YELL NOW)...";
         
         mediaRecorder.start();
         setTimeout(() => mediaRecorder.stop(), 2000);
@@ -577,8 +533,7 @@
       if (isArmed) {
         isArmed = false;
         body.className = '';
-        statusText.innerText = "YAP TRAP";
-        subText.innerText = "System Disarmed.";
+        statusText.innerText = "SYSTEM DISARMED";
         armBtn.innerText = "🚨 ARM THE TRAP 🚨";
         
         if (!isCalibrating) volumeMeterFill.style.width = '0%';
@@ -600,8 +555,7 @@
 
         isArmed = true;
         body.className = 'armed';
-        statusText.innerText = "SYSTEM ARMED";
-        subText.innerText = "Monitoring audio levels...";
+        statusText.innerText = "SYSTEM ARMED - MONITORING";
         armBtn.innerText = "🛑 DISARM SYSTEM 🛑";
 
         audioLoop();
@@ -650,8 +604,7 @@
     function fireShutUp() {
       isCooldown = true;
       body.className = 'triggered';
-      statusText.innerText = "SHUT UP!";
-      subText.innerText = "Volume threshold breached.";
+      statusText.innerText = "🚨 SHUT UP! 🚨";
 
       const selectedVoice = voiceSelect.value;
       if (selectedVoice === 'custom') {
@@ -664,8 +617,7 @@
       setTimeout(() => {
         if (isArmed) {
           body.className = 'armed';
-          statusText.innerText = "SYSTEM ARMED";
-          subText.innerText = "Monitoring audio levels...";
+          statusText.innerText = "SYSTEM ARMED - MONITORING";
         }
         isCooldown = false;
       }, 3000);
